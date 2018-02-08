@@ -264,9 +264,9 @@ class IOCRegex(object):
                                                    addl_defangs=addl_defangs,
                                                    remove_chars=remove_chars)
             if not defanged_:
-                content.append((w.lower(), None))
+                content.append((w, None))
             else:
-                content.append((w.lower(), dw.lower()))
+                content.append((w, dw))
         return content
 
     @classmethod

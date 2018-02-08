@@ -1,5 +1,5 @@
 import regex
-from random import choice
+import random
 
 USER_AGENTS = [
     'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36',
@@ -16,7 +16,7 @@ USER_AGENTS = [
 
 
 def HEADERS():
-    return {'User-Agent': choice(USER_AGENTS),
+    return {'User-Agent': random.choice(USER_AGENTS),
             'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'}
 
 
