@@ -1,5 +1,5 @@
 from ioc_regex import consts
-from .domain_util import possible_domain, possible_ip4
+from .domain_util import possible_domain, possible_ip4, filter_domain
 URLPARSE = None
 
 
@@ -625,3 +625,8 @@ class IOCRegex(object):
                                            remove_chars=remove_chars,
                                            addl_keywords=addl_keywords)
         return cls.is_good_result(results), results
+
+
+    @classmethod
+    def filter_domain(cls, domain):
+        return filter_domain(domain)
