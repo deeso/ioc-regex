@@ -608,10 +608,11 @@ class IOCRegex(object):
         hashes_s = [consts.MD5, consts.SHA1,
                     consts.SHA256, consts.SHA512]
 
+        hashes = []
         for k in hashes_s:
             hashes = hashes + results[k]
 
-        results[consts.HASHES] = hashes
+        results[consts.HASHES] = sorted(set(hashes))
         return results
 
     @classmethod
@@ -625,7 +626,6 @@ class IOCRegex(object):
                                            remove_chars=remove_chars,
                                            addl_keywords=addl_keywords)
         return cls.is_good_result(results), results
-
 
     @classmethod
     def filter_domain(cls, domain):
