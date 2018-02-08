@@ -1,15 +1,39 @@
 import regex
+from random import choice
+
+USER_AGENTS = [
+    'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/602.2.14 (KHTML, like Gecko) Version/10.0.1 Safari/602.2.14',
+    'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36',
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36',
+    'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0'
+]
+
+
+def HEADERS():
+    return {'User-Agent': choice(USER_AGENTS),
+            'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'}
 
 
 def rex_compile(pattern):
     return regex.compile(pattern)
 
+COMMON_URI_DEFANGS = [
+    ('x', 't'),
+    ('X', 't'),
+    ('T', 't')
+]
 COMMON_DEFANGS = [('[.', '.'),
                   ('.]', '.'),
-                  ('hxxp', 'http'),
-                  ('htxp', 'http'),
-                  ('hxtp', 'http'),
-                  ('fxp', 'ftp'),
+                  # ('hxxp', 'http'),
+                  # ('htxp', 'http'),
+                  # ('hxtp', 'http'),
+                  # ('fxp', 'ftp'),
                   ('[:', ':'),
                   (':]', ':'),
                   ('[@', '@'),
@@ -107,7 +131,7 @@ MD5 = "md5"
 SHA1 = "sha1"
 SHA256 = "sha256"
 SHA512 = "sha512"
-HASH_TAG = "tag"
+HASH_TAG = "hashtag"
 
 
 HASHES = HASH + 'es'

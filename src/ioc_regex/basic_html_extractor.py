@@ -6,6 +6,22 @@ from bs4 import BeautifulSoup, SoupStrainer
 import requests
 import json
 
+US = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36'
+
+
+desktop_agents = ['Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36',
+                 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36',
+                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36',
+                 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/602.2.14 (KHTML, like Gecko) Version/10.0.1 Safari/602.2.14',
+                 'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36',
+                 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_12_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36',
+                 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.98 Safari/537.36',
+                 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.71 Safari/537.36',
+                 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36',
+                 'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:50.0) Gecko/20100101 Firefox/50.0']
+ 
+def random_headers():
+    return {'User-Agent': choice(desktop_agents),'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8'}
 
 class ContentHandler(object):
 
@@ -22,7 +38,7 @@ class ContentHandler(object):
         self.bs4_parser = None
         if self.link is not None and self.content is None:
             # download the link
-            self.response = requests.get(self.link)
+            self.response = requests.get(self.link, headers=random_headers())
             self.content_type = self.response.headers['content-type']
             # read the contents
             if self.response.status_code == 200:
@@ -44,50 +60,15 @@ class ContentHandler(object):
             self.content = json.dumps(json_data, indent=0, sort_keys=True)
             self.bs4_parser = BeautifulSoup(self.content, 'html.parser')
 
-        self.embedded_links = self.extract_embedded_links()
+        try:
+            self.embedded_links = self.extract_embedded_links()
+        except:
+            self.embedded_links = []
 
-        self.artifacts = self.extract_all()
-
-    @classmethod
-    def create_content(cls, line):
-        tokens = [w for w in line.split() if len(w) > 5]
-        content = []
-        for w in tokens:
-            defanged_, dw = cls.check_and_defang(w)
-            if not defanged_:
-                content.append((w, None))
-            else:
-                content.append((w, dw))
-        return content
-
-    @classmethod
-    def extract_domain_or_host(cls, line, defanged_only=False):
-        r = {consts.IPS: [],
-             consts.DOMAINS: [],
-             consts.DF_DOMAINS: [],
-             consts.DF_IPS: []}
-        content = cls.create_content(line)
-        for w, dw in content:
-            domain = cls.R_DOMAIN_RE.search(w)
-            ip = cls.R_IP_RE.search(w)
-            if ip is not None and dw is None:
-                d = ip.captures()[0]
-                r[consts.IPS].append(d)
-            elif ip is not None:
-                d = ip.captures()[0]
-                r[consts.DF_IPS].append(d)
-
-            if domain is not None and dw is not None:
-                d = domain.captures()[0]
-                # check domain tlds first
-                if possible_domain(d):
-                    r[consts.DF_DOMAINS].append(d)
-            elif domain is not None:
-                d = domain.captures()[0]
-                # check domain tlds first
-                if possible_domain(d):
-                    r[consts.DOMAINS].append(d)
-        return r
+        try:
+            self.artifacts = IOCREX.extract_all_possible(content)
+        except:
+            self.artifacts = {}
 
     def extract_embedded_links(self):
         urls = set()
@@ -135,110 +116,3 @@ class ContentHandler(object):
                     y = el_r[consts.DOMAINS] + [i for i in hi[consts.DOMAINS]]
                     el_r[consts.DOMAINS] = sorted(set(y))
         return el_r
-
-    def extract_all(self):
-        content = self.content
-        if content is None:
-            return None
-
-        return IOCREX.extract_all_possible(content)
-
-    # def extract_all(self):
-    #     lines = []
-    #     if self.content is not None:
-    #         ls = self.content.splitlines()
-    #         lines = [i.strip() for i in ls if len(i.strip()) > 0]
-
-    #     link_seen = set()
-    #     ip_seen = set()
-    #     hashes_seen = set()
-    #     domain_seen = set()
-    #     results = {consts.HASHES: [],
-    #                consts.DOMAINS: [],
-    #                consts.LINKS: [],
-    #                consts.IPS: [],
-    #                consts.DF_IPS: [],
-    #                consts.DF_DOMAINS: [],
-    #                consts.DF_LINKS: [], }
-
-    #     for line in lines:
-    #         results = IOCREX.get_host_info_update(line, results,
-    #                                               ip_seen, domain_seen)
-    #         uinfos = IOCREX.extract_link(line)
-    #         if len(uinfos[consts.LINKS]) > 0:
-    #             links = uinfos[consts.LINKS]
-    #             _urls = results[consts.URLS]
-    #             urls = set(IOCREX.links_to_urls(links) + _urls)
-    #             results[consts.URLS] = urls
-
-    #             hosts = IOCREX.extract_hosts_from_links(links)
-    #             for host in hosts:
-    #                 if IOCREX.possible_domain(host):
-    #                     results[consts.DOMAINS].append(host)
-    #                 elif IOCREX.possible_ip4(host):
-    #                     results[consts.IPS].append(host)
-
-    #         if len(uinfos[consts.DF_LINKS]) > 0:
-    #             links = uinfos[consts.DF_LINKS]
-    #             _urls = results[consts.DF_URLS]
-    #             urls = set(IOCREX.links_to_urls(links) + _urls)
-    #             results[consts.DF_URLS] = urls
-
-    #             hosts = IOCREX.extract_hosts_from_links(links)
-    #             for host in hosts:
-    #                 if IOCREX.possible_domain(host):
-    #                     results[consts.DF_DOMAINS].append(host)
-    #                 elif IOCREX.possible_ip4(host):
-    #                     results[consts.DF_IPS].append(host)
-
-    #         hinfo = IOCREX.extract_hash(line)
-    #         if len(hinfo[consts.HASHES]) > 0:
-    #             g = [i for i in hinfo[consts.HASHES] if i not in hashes_seen]
-    #             results[consts.HASHES] = results[consts.HASHES] + g
-    #             hashes_seen |= set(g)
-
-    #     # update hosts, domains, and urls from the actual results (redundant)
-    #     hosts = IOCREX.extract_hosts_from_links(results[consts.LINKS])
-    #     _df_links = results[consts.DF_LINKS]
-    #     df_hosts = IOCREX.defang_extract_hosts_from_links(_df_links)
-
-    #     for host in hosts:
-    #         if IOCREX.possible_domain(host):
-    #             results[consts.DOMAINS].append(host)
-    #         elif IOCREX.possible_ip4(host):
-    #             results[consts.IPS].append(host)
-
-    #     for host in df_hosts:
-    #         if IOCREX.possible_domain(host):
-    #             results[consts.DF_DOMAINS].append(host)
-    #         elif IOCREX.possible_ip4(host):
-    #             results[consts.DF_IPS].append(host)
-
-    #     clean_results = {
-    #                 consts.URLS: sorted(set(results[consts.URLS])),
-    #                 consts.DF_URLS: sorted(set(results[consts.DF_URLS])),
-    #                 consts.IPS: sorted(set(results[consts.IPS])),
-    #                 consts.DF_IPS: sorted(set(results[consts.DF_IPS])),
-    #                 consts.DOMAINS: sorted(set(results[consts.DOMAINS])),
-    #                 consts.DF_DOMAINS: sorted(set(results[consts.DF_DOMAINS])),
-    #                 consts.HASHES: sorted(set(results[consts.HASHES])),
-    #             }
-
-    #     link_seen = set()
-    #     for link in results[consts.LINKS]:
-    #         x, y = link[consts.PROTO], link[consts.URL]
-    #         if x+y in link_seen:
-    #             continue
-    #         link_seen.add(x+y)
-    #         clean_results[consts.URLS].append(link)
-
-    #     clean_results[consts.URLS] = sorted(set(clean_results[consts.URLS]))
-
-    #     link_seen = set()
-    #     for link in results[consts.DF_LINKS]:
-    #         x, y = link[consts.PROTO], link[consts.URL]
-    #         if x+y in link_seen:
-    #             continue
-    #         link_seen.add(x+y)
-    #         clean_results[consts.DF_URLS].append(link)
-    #     return clean_results

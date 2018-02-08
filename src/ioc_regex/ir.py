@@ -17,9 +17,9 @@ except:
 
 class IOCRegex(object):
     PATTERNS = {
+        # consts.URI: consts.URI_RE,
         consts.DOMAIN: consts.DOMAIN_RE,
         consts.IP: consts.IP_RE,
-        # consts.URI: consts.URI_RE,
         consts.URL: consts.URL_RE,
         consts.URL_POT: consts.URL_POT_RE,
         consts.HASH_TAG: consts.HASH_TAG_RE,
@@ -112,7 +112,15 @@ class IOCRegex(object):
     @classmethod
     def undefang(cls, token, addl_defangs=[], remove_chars=[]):
         defangs = addl_defangs + consts.COMMON_DEFANGS
-        nt = token.lower()
+        nt = token
+        # urls are case sensitive
+        if nt.find("://") > -1:
+            oscheme = nt.split('://')[0]
+            nscheme = oscheme
+            for o, n in consts.COMMON_URI_DEFANGS:
+                nscheme = nscheme.replace(o, n)
+            nt = nt.replace(oscheme, nscheme)
+
         for ov, nv in defangs:
             if nt.find(ov) > -1:
                 nt = nt.replace(ov, nv)
@@ -597,6 +605,13 @@ class IOCRegex(object):
                                         remove_chars=remove_chars,
                                         treat_as_tokens=False)
         results[consts.KEYWORDS] = keywords
+        hashes_s = [consts.MD5, consts.SHA1,
+                    consts.SHA256, consts.SHA512]
+
+        for k in hashes_s:
+            hashes = hashes + results[k]
+
+        results[consts.HASHES] = hashes
         return results
 
     @classmethod
