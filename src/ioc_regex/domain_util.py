@@ -1876,7 +1876,8 @@ FILTER_DOMAINS = [
     'techtarget.com',
     'securityintelligence.com',
     'googleadservices.com',
-    'computerweekly.com'
+    'computerweekly.com',
+    't.co'
 ]
 
 FILE_EXTS = ['zip', 'html', 'exe']

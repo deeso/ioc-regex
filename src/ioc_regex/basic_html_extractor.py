@@ -22,7 +22,8 @@ class ContentHandler(object):
         self.bs4_parser = None
         if self.link is not None and self.content is None:
             # download the link
-            self.response = requests.get(self.link, headers=consts.HEADERS())
+            self.response = requests.get(self.link)
+            # self.response = requests.get(self.link, headers=consts.HEADERS())
             self.content_type = self.response.headers['content-type']
             # read the contents
             if self.response.status_code == 200:

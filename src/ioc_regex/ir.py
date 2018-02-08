@@ -451,8 +451,9 @@ class IOCRegex(object):
                  [consts.DEFANGED + "_" + i for i in t]
 
         r = []
-        for i in checks:
-            r.append(len(ioc_regex_results[i]) > 0)
+        for c in checks:
+            v = ioc_regex_results.get(c, [])
+            r.append(len(v) > 0)
         return any(r)
 
     @classmethod
@@ -629,4 +630,12 @@ class IOCRegex(object):
 
     @classmethod
     def filter_domain(cls, domain):
-        return filter_domain(domain)
+        d = domain
+        if d is None:
+            return False
+
+        if domain.find("://") > 0:
+            d = cls.host_from_url(domain)
+            if d is None:
+                return False
+        return filter_domain(d)

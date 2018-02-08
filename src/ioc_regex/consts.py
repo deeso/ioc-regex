@@ -28,7 +28,9 @@ COMMON_URI_DEFANGS = [
     ('X', 't'),
     ('T', 't')
 ]
-COMMON_DEFANGS = [('[.', '.'),
+COMMON_DEFANGS = [('.]]', '.'),
+                  ('[[.', '.'),
+                  ('[.', '.'),
                   ('.]', '.'),
                   # ('hxxp', 'http'),
                   # ('htxp', 'http'),
@@ -76,6 +78,7 @@ COMMON_KEYWORDS = [
         ['teslacrypt', '^teslacrypt.*'],
         ['badrabbit', '^badrabbit.*'],
         ['locky', '^locky.*'],
+        ['locky', '^locki.*'],
         ['pandabanker', '^pandabankder.*'],
         ['seamless', '^seamless'],
         ['smokeloader', '^smokeloader.*'],
@@ -92,7 +95,6 @@ COMMON_KEYWORDS = [
         ['malware', '^[Mm]alware$'],
         ['spyware', '^spyware$'],
         ['adware', '^[Aa]dware$'],
-        ['open directory', '^open directory$'],
         ['ransomware', '$[Rr]ansomware'],
         ['botnet', '$[Bb]otnet'],
         ['black market', '$black market^'],
@@ -109,6 +111,7 @@ COMMON_KEYWORDS = [
         ['malware', '^sample$'],
         ['trojan', '^trojan$'],
         ['compromised', '^compromised$'],
+        ['open directory', '.*open directory'],
         ]
 
 COMMON_REMOVE_CHARS = ['&lt;', '&gt;', '<', '>']
