@@ -117,7 +117,7 @@ COMMON_KEYWORDS = [
         ]
 
 COMMON_REMOVE_CHARS = ['&lt;', '&gt;', '<', '>']
-KEYWORD = 'keyword'
+KEYWORDS = 'keyword'
 R_COMMON_KEYWORDS = {p: regex.compile(p) for _, p in COMMON_KEYWORDS}
 
 DEFANGED_RESULTS = 'defanged_results'
