@@ -112,6 +112,7 @@ COMMON_KEYWORDS = [
         ['trojan', '^trojan$'],
         ['compromised', '^compromised$'],
         ['open directory', '.*open directory'],
+        ['phishing', '.*phish.*']
         ]
 
 COMMON_REMOVE_CHARS = ['&lt;', '&gt;', '<', '>']

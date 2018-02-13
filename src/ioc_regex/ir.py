@@ -457,6 +457,20 @@ class IOCRegex(object):
         return any(r)
 
     @classmethod
+    def is_good_df_result(cls, ioc_regex_results):
+        t = [consts.DOMAIN, consts.IP, consts.URL,
+             consts.URL_POT, consts.EMAIL, consts.URL_POT, ]
+        checks = [consts.MD5, consts.SHA1,
+                  consts.SHA256, consts.SHA512] + \
+                 [consts.DEFANGED + "_" + i for i in t]
+
+        r = []
+        for c in checks:
+            v = ioc_regex_results.get(c, [])
+            r.append(len(v) > 0)
+        return any(r)
+
+    @classmethod
     def get_url_results(cls, ioc_regex_results):
         return ioc_regex_results[consts.URL], \
                ioc_regex_results[consts.DF_URL]
