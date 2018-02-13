@@ -103,9 +103,9 @@ COMMON_KEYWORDS = [
         ['rat', '.*[Rr][Aa][Tt]$'],
         ['c2', '[Cc]2$'],
         ['c2', 'command and control$'],
-        ['maldoc?', 'doc$'],
+        ['maldoc', 'doc$'],
         ['email', 'email$'],
-        ['maldoc?', 'document$'],
+        ['maldoc', 'document$'],
         ['maldoc', 'maldoc$'],
         ['maldoc', 'malicious document$'],
         ['powershell', 'powershell$'],
@@ -117,7 +117,7 @@ COMMON_KEYWORDS = [
         ]
 
 COMMON_REMOVE_CHARS = ['&lt;', '&gt;', '<', '>']
-KEYWORDS = 'keywords'
+KEYWORD = 'keyword'
 R_COMMON_KEYWORDS = {p: regex.compile(p) for _, p in COMMON_KEYWORDS}
 
 DEFANGED_RESULTS = 'defanged_results'
