@@ -615,7 +615,7 @@ class IOCRegex(object):
 
         results = cls.filter_email_domains_from_domains(results)
         remove_chars = ['#', ] + remove_chars
-        keywords = cls.extract_keywords(content,
+        keywords = cls.extract_keywords(content.lower(),
                                         addl_keywords=addl_keywords,
                                         remove_chars=remove_chars,
                                         treat_as_tokens=False)
