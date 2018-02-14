@@ -523,6 +523,14 @@ class IOCRegex(object):
                 dfr = [i for i in dfr if cls.is_valid_pot_url(i)]
                 cr = [i for i in cr if cls.is_valid_pot_url(i)]
 
+            elif name == consts.EMAIL or name == consts.DF_EMAIL:
+                vflt = lambda i: i.find('..') == -1 and \
+                                 i.find('.@') == -1 and \
+                                 i.find('@.') == -1
+
+                dfr = [i for i in dfr if vflt(i)]
+                cr = [i for i in cr if vflt(i)]
+
             if name in hashes:
                 clean_results[name] = cls.all_but_empty(cr)
                 continue
