@@ -137,6 +137,7 @@ SHA1 = "sha1"
 SHA256 = "sha256"
 SHA512 = "sha512"
 HASH_TAG = "hashtag"
+TAG = "tag"
 
 
 HASHES = HASH + 'es'
@@ -151,6 +152,7 @@ MD5S = MD5 + 's'
 SHA1S = SHA1 + 's'
 SHA256S = SHA256 + 's'
 SHA512S = SHA512 + 's'
+TAGS = TAG + 's'
 
 DF_HASH = "defanged_" + HASH
 DF_DOMAIN = "defanged_" + DOMAIN
