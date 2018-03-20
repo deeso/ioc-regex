@@ -23,6 +23,204 @@ def HEADERS():
 def rex_compile(pattern):
     return regex.compile(pattern)
 
+TROJAN = u'trojan'
+BACKDOOR = u'backdoor'
+DROPPER = u'dropper'
+RANSOMWARE = u'ransomware'
+EXPLOIT_KIT = u'exploitkit'
+WORM = u"worm"
+VIRUS = u'virus'
+APT = u'apt'
+CRIMEWARE = u'crimeware'
+INFORMATION_STEALER = u'infostealer'
+MOBILE_TROJAN = 'umobile trojan'
+CRYPTOMINING = u'cryptomining'
+PHISHING = u'phishing'
+MALWARE = u'malware'
+SPYWARE = u'spyware'
+ADWARE = u'adware'
+INFRASTRUCTURE = u'infrastructure'
+EMAIL = u'email'
+URL = u'url'
+DOMAIN = u'domain'
+
+
+COMMON_KEYWORD_CLASSIFICATION = [
+    [u'adwind', TROJAN],
+    [u'adylkuzz', TROJAN],
+    [u'afraid', RANSOMWARE],
+    [u'afriad', EXPLOIT_KIT],
+    [u'agenttesla', RANSOMWARE],
+    [u'angler', EXPLOIT_KIT],
+    [u'afraid', RANSOMWARE],
+    [u'alphacrypt', RANSOMWARE],
+    [u'andromeda', TROJAN],
+    [u'angler', EXPLOIT_KIT],
+    [u'arescrypt', RANSOMWARE],
+    [u'asprox', WORM],
+
+    [u'backoff', TROJAN],
+    [u'badrabbit', RANSOMWARE],
+    [u'bandarchore', EXPLOIT_KIT],
+    [u'bamital', TROJAN],
+    [u'banjori', TROJAN],
+    [u'bebloh', TROJAN],
+    [u'bedep', TROJAN],
+    [u'beebone', VIRUS],
+    [u'blackenergy', APT],
+    [u'brobot', TROJAN],
+    
+    [u'caphaw', TROJAN],
+    [u'carbanak', APT],
+    [u'cerber', RANSOMWARE],
+    [u'conficker', WORM],
+    [u'corebot', TROJAN],
+    [u'cryptodefense', RANSOMWARE],
+    [u'cryptolocker', RANSOMWARE],
+    [u'cryptowall', RANSOMWARE],
+    [u'cryptxxx', RANSOMWARE],
+    [u'chthonic', TROJAN],
+    [u'crypmic', RANSOMWARE],
+    [u'cryptmic', RANSOMWARE],
+    
+    [u'darkleech', CRIMEWARE],
+    [u'dexter', VIRUS],
+    [u'dircrypt', RANSOMWARE],
+    [u'dridex', TROJAN],
+    [u'dyre', TROJAN],
+
+    [u'eitest', TROJAN],
+    [u'emotet', TROJAN],
+    [u'explosive', APT],
+    [u'fiesta', EXPLOIT_KIT],
+    [u'fobber', INFORMATION_STEALER],
+    [u'formbook', APT],
+    
+    [u'gameoverzeus', TROJAN],
+    [u'zeus', TROJAN],
+    [u'gandcrab', TROJAN],
+    [u'geodo', TROJAN],
+    [u'goodman', EXPLOIT_KIT],
+    [u'gootkit', EXPLOIT_KIT],
+    [u'globeimposter', APT],
+    
+    [u'hailstorm', TROJAN],
+    [u'hancitor', TROJAN],
+    [u'havex', TROJAN],
+    [u'hesperbot', TROJAN],
+
+    [u'icedid', TROJAN],
+    [u'infinity', EXPLOIT_KIT],
+    
+    [u'jbitfrost', TROJAN],
+    [u'jigsaw', TROJAN],
+
+    [u'kaixin', EXPLOIT_KIT],
+    [u'kelihos', TROJAN],
+    [u'kraken', TROJAN],
+    [u'kuluoz', TROJAN],
+    
+    [u'locky', RANSOMWARE],
+    [u'locki', RANSOMWARE],
+    
+    [u'magnitude', EXPLOIT_KIT],
+    [u'magnitudeek', EXPLOIT_KIT],
+    [u'mask', TROJAN],
+    [u'matsnu', BACKDOOR],
+    [u'mirai', WORM],
+    [u'murofet', TROJAN],
+
+    [u'nebula', EXPLOIT_KIT],
+    [u'necurs', TROJAN],
+    [u'neutrino', EXPLOIT_KIT],
+    [u'neurtrino', EXPLOIT_KIT],
+    [u'neutrino', EXPLOIT_KIT],
+    [u'njrat', TROJAN],
+    [u'nuclear', EXPLOIT_KIT],
+    [u'nyetya', RANSOMWARE],
+    
+    [u'odin', RANSOMWARE],
+
+    [u'padcrypt', RANSOMWARE],
+    [u'pandabanker', TROJAN],
+    [u'petya', RANSOMWARE],
+    [u'pony', EXPLOIT_KIT],
+    [u'pseudo', RANSOMWARE],
+    [u'pushdo', TROJAN],
+    [u'pykspa', WORM],
+
+    [u'qadars', TROJAN],
+    [u'qakbot', TROJAN],
+    [u'qbot', TROJAN],
+
+    [u'ramdo', TROJAN],
+    [u'ramnit', RANSOMWARE],
+    [u'ranbyus', TROJAN],
+    [u'reign', APT],
+    [u'rig', EXPLOIT_KIT],
+    [u'rigek', EXPLOIT_KIT],
+    [u'rovnix', TROJAN],
+    [u'rulan', DROPPER],
+
+    [u'seamless', EXPLOIT_KIT],
+    [u'shiotob', TROJAN],
+    [u'sisron', TROJAN],
+    [u'smokeloader', TROJAN],
+    [u'sofacy', APT],
+    [u'sundown', EXPLOIT_KIT],
+    [u'suppobox', TROJAN],
+    [u'sweetorange', APT],
+    [u'symmi', TROJAN],
+
+    [u'tempedreve', WORM],
+    [u'terdot', TROJAN],
+    [u'terror', EXPLOIT_KIT],
+    [u'teslacrypt', RANSOMWARE],
+    [u'tinba', TROJAN],
+    [u'torrentlocker', RANSOMWARE],
+    [u'trickbot', TROJAN],
+ 
+    [u'upatre', TROJAN],
+    [u'ursnif', TROJAN],
+    
+    [u'vawtrak', TROJAN],
+    
+    [u'wannacry', RANSOMWARE],
+    [u'webcryptominer', TROJAN],
+    [u'wirelurker', MOBILE_TROJAN],
+    
+    [u'xagent', TROJAN],
+    [u'xpiro', TROJAN],
+    
+    [u'zbot', TROJAN],
+    [u'zepto', RANSOMWARE],
+
+    
+    [u'cryptominer', CRYPTOMINING],
+    [u'phishing', PHISHING],
+    [u'url', URL],
+    [u'domain', DOMAIN],
+    [u'control panel', INFRASTRUCTURE],
+    [u'exploitkit', MALWARE],
+    [u'gate', INFRASTRUCTURE],
+    [u'malware', MALWARE],
+    [u'spyware', SPYWARE],
+    [u'adware', ADWARE],
+    [u'ransomware', RANSOMWARE],
+    [u'botnet', INFRASTRUCTURE],
+
+    [u'rat', TROJAN],
+    [u'c2', INFRASTRUCTURE],
+    [u'maldoc', MALWARE],
+    [u'email', EMAIL],
+    [u'powershell', MALWARE],
+    [u'malware', MALWARE],
+    [u'trojan', TROJAN],
+    [u'compromised', TROJAN],
+    [u'open directory', INFRASTRUCTURE],
+    [u'opendirectory', INFRASTRUCTURE],
+]
+
 COMMON_URI_DEFANGS = [
     ('x', 't'),
     ('X', 't'),
