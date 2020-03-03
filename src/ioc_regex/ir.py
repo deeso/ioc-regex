@@ -8,12 +8,8 @@ try:
 except:
     pass
 
-try:
-    if URLPARSE is None:
-        from urllib2 import urlparse as URLPARSE
-except:
-    pass
-
+if URLPARSE is None:
+    raise Exception("Unable to import urllib.parse.urlparse")
 
 class IOCRegex(object):
     PATTERNS = {
@@ -180,7 +176,7 @@ class IOCRegex(object):
     @classmethod
     def host_from_url(cls, url):
         try:
-            host = URLPARSE.urlsplit(url).netloc
+            host = URLPARSE(url)[1]
             if cls.possible_domain(host):
                 return host
             return None
@@ -296,10 +292,10 @@ class IOCRegex(object):
                 consts.SHA512: [],
             }
         for w in line.split():
-            md5 = cls.search(consts.MD5, w)
-            sha1 = cls.search(consts.SHA1, w)
-            sha256 = cls.search(consts.SHA256, w)
-            sha512 = cls.search(consts.SHA512, w)
+            md5 = cls.search(consts.MD5, w) if len(w) == 32 else None
+            sha1 = cls.search(consts.SHA1, w) if len(w) == 40 else None
+            sha256 = cls.search(consts.SHA256, w) if len(w) == 64 else None
+            sha512 = cls.search(consts.SHA512, w) if len(w) == 128 else None
             h = None
             if sha512 is not None:
                 h = sha512.captures()[0]
@@ -532,7 +528,7 @@ class IOCRegex(object):
                 cr = [i for i in cr if vflt(i)]
 
             if name in hashes:
-                clean_results[name] = cls.all_but_empty(cr)
+                # clean_results[name] = cls.all_but_empty(cr)
                 continue
 
             clean_results[name] = cls.all_but_empty(cr)
@@ -614,7 +610,7 @@ class IOCRegex(object):
         defanged_results[consts.URL] = uris_urls
         del defanged_results[consts.URI]
 
-        results = {}
+        results = cls.extract_hash(content)
         for k, v in clean_results.items():
             results[k] = v
 
