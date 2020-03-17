@@ -15,6 +15,7 @@ class IOCRegex(object):
     PATTERNS = {
         # consts.URI: consts.URI_RE,
         consts.DOMAIN: consts.DOMAIN_RE,
+        consts.DOMAIN_PORT: consts.DOMAIN_PORT_RE,
         consts.IP: consts.IP_RE,
         consts.URL: consts.URL_RE,
         consts.URL_POT: consts.URL_POT_RE,
@@ -29,6 +30,7 @@ class IOCRegex(object):
     REGEXS = {
         # consts.URI: consts.R_URI_RE,
         consts.DOMAIN: consts.R_DOMAIN_RE,
+        consts.DOMAIN_PORT: consts.R_DOMAIN_PORT_RE,
         consts.IP: consts.R_IP_RE,
         consts.URL: consts.R_URL_RE,
         consts.URL_POT: consts.R_URL_POT_RE,
@@ -147,18 +149,22 @@ class IOCRegex(object):
     def extract_domain_or_host(cls, line, defanged_only=False):
         r = {consts.IPS: [],
              consts.DOMAINS: [],
+             consts.DOMAIN_PORTS: [],
              consts.DF_DOMAINS: [],
+             consts.DF_DOMAIN_PORTS: [],
              consts.DF_IPS: []}
         content = cls.convert_tokenize_line(line)
         for w, dw in content:
             domain = cls.search(consts.DOMAIN, w)
             ip = cls.search(consts.IP, w)
+            domain_port = cls.search(consts.DOMAIN_PORT)
             if ip is not None and dw is None:
                 d = ip.captures()[0]
                 r[consts.IPS].append(d)
             elif ip is not None:
                 d = ip.captures()[0]
                 r[consts.DF_IPS].append(d)
+
 
             if domain is not None and dw is not None:
                 d = domain.captures()[0]
@@ -170,6 +176,21 @@ class IOCRegex(object):
                 # check domain tlds first
                 if possible_domain(d):
                     r[consts.DOMAINS].append(d)
+
+            if domain_port is not None and dw is not None:
+                v = domain_port.captures()[0]
+                d = v.split(':')[0]
+                p = v.split(':')[-1]
+                # check domain tlds first
+                if possible_domain(d) and p.isdigit():
+                    r[consts.DF_DOMAIN_PORTS].append([d, p])
+            elif domain_port is not None:
+                v = domain_port.captures()[0]
+                d = v.split(':')[0]
+                p = v.split(':')[-1]
+                # check domain tlds first
+                if possible_domain(d) and p.isdigit():
+                    r[consts.DOMAIN_PORTS].append([d, p])
 
         return r
 
@@ -345,8 +366,10 @@ class IOCRegex(object):
 
         ips = results[consts.IPS] + hi[consts.IPS]
         domains = results[consts.DOMAINS] + hi[consts.DOMAINS]
+        domain_ports = [i['domain'] for i in results[consts.DOMAIN_PORTS]] + \
+                       [i['domain'] for i in hi[consts.DOMAIN_PORTS]]
         results[consts.IPS] = cls.all_but_empty(ips)
-        results[consts.DOMAINS] = cls.all_but_empty(domains)
+        results[consts.DOMAINS] = cls.all_but_empty(domains + domain_ports)
         return results
 
     @classmethod
@@ -371,14 +394,24 @@ class IOCRegex(object):
             if domain not in email_domains:
                 new_domains.append(domain)
 
-        regex_results[consts.DF_DOMAIN] = new_domains
+        for domain_port in regex_results.get(consts.DF_DOMAIN_PORTS, []):
+            domain = domain_port[consts.DOMAIN]
+            if domain not in email_domains:
+                new_domains.append(domain)
+
+        regex_results[consts.DF_DOMAIN] = sorted(set(new_domains))
 
         new_domains = []
         for domain in regex_results[consts.DOMAIN]:
             if domain not in email_domains:
                 new_domains.append(domain)
 
-        regex_results[consts.DOMAIN] = new_domains
+        for domain_port in regex_results.get(consts.DOMAIN_PORTS, []):
+            domain = domain_port[consts.DOMAIN]
+            if domain not in email_domains:
+                new_domains.append(domain)
+
+        regex_results[consts.DOMAIN] = sorted(set(new_domains))
         return regex_results
 
     @classmethod
@@ -440,7 +473,8 @@ class IOCRegex(object):
     @classmethod
     def is_good_result(cls, ioc_regex_results):
         t = [consts.DOMAIN, consts.IP, consts.URL,
-             consts.URL_POT, consts.EMAIL, consts.URL_POT, ]
+             consts.URL_POT, consts.EMAIL, consts.URL_POT, 
+             consts.DOMAIN_PORTS,]
         checks = [i for i in t] + \
                  [consts.MD5, consts.SHA1,
                   consts.SHA256, consts.SHA512] + \
@@ -454,8 +488,9 @@ class IOCRegex(object):
 
     @classmethod
     def is_good_df_result(cls, ioc_regex_results):
-        t = [consts.DOMAIN, consts.IP, consts.URL,
-             consts.URL_POT, consts.EMAIL, consts.URL_POT, ]
+        t = [consts.DF_DOMAIN, consts.DF_IP, consts.DF_URL,
+             consts.DF_URL_POT, consts.DF_EMAIL, consts.DF_URL_POT,
+             consts.DF_DOMAIN_PORTS,]
         checks = [consts.MD5, consts.SHA1,
                   consts.SHA256, consts.SHA512] + \
                  [consts.DEFANGED + "_" + i for i in t]
@@ -479,7 +514,9 @@ class IOCRegex(object):
     @classmethod
     def get_domain_results(cls, ioc_regex_results):
         return ioc_regex_results[consts.DOMAIN], \
-               ioc_regex_results[consts.DF_DOMAIN]
+               ioc_regex_results[consts.DF_DOMAIN], \
+               ioc_regex_results[consts.DOMAIN_PORT], \
+               ioc_regex_results[consts.DF_DOMAIN_PORT]
 
     @classmethod
     def get_ip_results(cls, ioc_regex_results):
@@ -534,6 +571,26 @@ class IOCRegex(object):
             clean_results[name] = cls.all_but_empty(cr)
             defanged_results[name] = cls.all_but_empty(dfr)
 
+        # clean up domain_ports
+        domain_ports = []
+        for r in defanged_results[consts.DOMAIN_PORT]:
+            try:
+                d, p = r.split(':')
+                domain_ports.append({consts.DOMAIN: d, consts.PORT: p})
+            except:
+                continue
+
+        defanged_results[consts.DOMAIN_PORT] = domain_ports
+        domain_ports = []
+        for r in clean_results[consts.DOMAIN_PORT]:
+            try:
+                d, p = r.split(':')
+                domain_ports.append({consts.DOMAIN: d, consts.PORT: p})
+            except:
+                continue
+
+        clean_results[consts.DOMAIN_PORT] = domain_ports
+
         domains = cls.hosts_from_urls(defanged_results[consts.URL])
         new_domains = defanged_results[consts.DOMAIN] + domains
         new_domains = cls.only_domains(new_domains)
@@ -551,6 +608,7 @@ class IOCRegex(object):
 
         domains = cls.hosts_from_urls(clean_results[consts.URL_POT], True)
         new_domains = clean_results[consts.DOMAIN] + domains
+        new_domains = new_domains + [i[consts.DOMAIN] for i in defanged_results[consts.DOMAIN_PORT]]
         new_domains = cls.only_domains(new_domains)
         clean_results[consts.DOMAIN] = new_domains
 
@@ -575,6 +633,7 @@ class IOCRegex(object):
         clean_results[consts.IP] = new_hosts
 
         domains = cls.hosts_from_urls(defanged_results[consts.URI])
+        new_domains = new_domains + [i[consts.DOMAIN] for i in defanged_results[consts.DOMAIN_PORT]]
         new_domains = defanged_results[consts.DOMAIN] + domains
         new_domains = cls.only_domains(new_domains)
         defanged_results[consts.DOMAIN] = new_domains

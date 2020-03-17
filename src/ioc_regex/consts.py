@@ -43,6 +43,7 @@ INFRASTRUCTURE = u'infrastructure'
 EMAIL = u'email'
 URL = u'url'
 DOMAIN = u'domain'
+DOMAIN_PORT = u'domain_port'
 
 
 COMMON_KEYWORD_CLASSIFICATION = [
@@ -314,7 +315,7 @@ COMMON_KEYWORDS = [
         ['phishing', '.*phish.*']
         ]
 
-COMMON_REMOVE_CHARS = ['&lt;', '&gt;', '<', '>']
+COMMON_REMOVE_CHARS = ['&lt;', '&gt;', '<', '>', ',', '\n', '\t']
 KEYWORDS = 'keyword'
 R_COMMON_KEYWORDS = {p: regex.compile(p) for _, p in COMMON_KEYWORDS}
 
@@ -324,6 +325,7 @@ DEFANGED = "defanged"
 PROTO = "proto"
 HASH = "hash"
 DOMAIN = "domain"
+PORT = 'port'
 URL = "url"
 LINK = "link"
 URI = 'uri'
@@ -340,6 +342,7 @@ TAG = "tag"
 
 HASHES = HASH + 'es'
 DOMAINS = DOMAIN + 's'
+DOMAIN_PORTS = DOMAIN_PORT + 's'
 URLS = URL + 's'
 LINKS = LINK + 's'
 URIS = URI + 's'
@@ -354,6 +357,7 @@ TAGS = TAG + 's'
 
 DF_HASH = "defanged_" + HASH
 DF_DOMAIN = "defanged_" + DOMAIN
+DF_DOMAIN_PORT = "defanged_" + DOMAIN_PORT
 DF_URL = "defanged_" + URL
 DF_LINK = "defanged_" + LINK
 DF_URI = "defanged_" + URI
@@ -367,6 +371,7 @@ DF_SHA512 = "defanged_" + SHA512
 
 DF_HASHES = DF_HASH + 'es'
 DF_DOMAINS = DF_DOMAIN + 's'
+DF_DOMAIN_PORTS = DF_DOMAIN_PORT + 's'
 DF_URLS = DF_URL + 's'
 DF_LINKS = DF_LINK + 's'
 DF_URIS = DF_URI + 's'
@@ -381,6 +386,7 @@ DF_SHA512 = DF_SHA512 + 's'
 IOC_NAMES = [DOMAIN, IP, URL, URL_POT, EMAIL, MD5, SHA1, SHA256, SHA512]
 
 DOMAIN_RE = r'((?!-))(xn--)?[a-z0-9][a-z0-9-_]{0,61}[a-z0-9]{0,1}\.(xn--)?([a-z0-9\-]{1,61}|[a-z0-9-]{1,30}\.[a-z]{2,})$'
+DOMAIN_PORT_RE = r'((?!-))(xn--)?[a-z0-9][a-z0-9-_]{0,61}[a-z0-9]{0,1}\.(xn--)?([a-z0-9\-]{1,61}|[a-z0-9-]{1,30}\.[a-z]{2,}(?::[0-9]{1,5})?)$'
 IP_RE = r'(?<![0-9])(?:(?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2})[.](?:25[0-5]|2[0-4][0-9]|[0-1]?[0-9]{1,2}))(?![0-9])'
 URI_RE = r"(.\w+:\/\/)?([\w.-]+(?:\.[\w\.-]+)+[\w\-\._~:/?#[\]@!\$&'\(\)\*\+,;=.]+)"
 URL_RE = r"(h[xXtT][xXtT]p:\/\/|h[xXt][xXt]ps:\/\/)+[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?"
@@ -393,6 +399,7 @@ SHA256_RE = r"([a-fA-F\d]{64})"
 SHA512_RE = r"([a-fA-F\d]{128})"
 
 R_DOMAIN_RE = regex.compile(DOMAIN_RE)
+R_DOMAIN_PORT_RE = regex.compile(DOMAIN_PORT_RE)
 R_IP_RE = regex.compile(IP_RE)
 R_URI_RE = regex.compile(URI_RE)
 R_URL_RE = regex.compile(URL_RE)
