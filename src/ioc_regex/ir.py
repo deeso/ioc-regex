@@ -561,8 +561,8 @@ class IOCRegex(object):
                                  i.find('.@') == -1 and \
                                  i.find('@.') == -1
 
-                dfr = [i for i in dfr if vflt(i)]
-                cr = [i for i in cr if vflt(i)]
+                dfr = [i.strip('.') for i in dfr if vflt(i)]
+                cr = [i.strip('.') for i in cr if vflt(i)]
 
             if name in hashes:
                 # clean_results[name] = cls.all_but_empty(cr)
