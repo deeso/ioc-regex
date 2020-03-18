@@ -658,6 +658,10 @@ class IOCRegex(object):
         clean_results[consts.DOMAIN] = _t
         uris_urls = clean_results[consts.URI] + clean_results[consts.URL]
         uris_urls = cls.all_but_empty(uris_urls)
+        uris_urls = [i for i in cls.all_but_empty(uris_urls) if not i in clean_results[consts.DOMAIN]]
+        clean_results[consts.URL] = uris_urls
+        clean_results[consts.URL_POT] = [i for i in clean_results[consts.URL_POT] if i not in clean_results[consts.DOMAIN]]
+
         clean_results[consts.URL] = uris_urls
         del clean_results[consts.URI]
         _t = cls.all_but_empty(defanged_results[consts.IP])
@@ -665,9 +669,11 @@ class IOCRegex(object):
         _t = cls.only_domains(defanged_results[consts.DOMAIN])
         defanged_results[consts.DOMAIN] = _t
         uris_urls = defanged_results[consts.URI] + defanged_results[consts.URL]
-        uris_urls = cls.all_but_empty(uris_urls)
+        uris_urls = [i for i in cls.all_but_empty(uris_urls) if not i in defanged_results[consts.DOMAIN]]
         defanged_results[consts.URL] = uris_urls
+        defanged_results[consts.URL_POT] = [i for i in defanged_results[consts.URL_POT] if i not in defanged_results[consts.DOMAIN]]
         del defanged_results[consts.URI]
+
 
         results = cls.extract_hash(content)
         for k, v in clean_results.items():
@@ -691,6 +697,26 @@ class IOCRegex(object):
             hashes = hashes + results[k]
 
         results[consts.HASHES] = sorted(set(hashes))
+        # filter actual urls from potential urls
+        to_filter = []
+        for u in results[consts.DF_URL]:
+            if u.find('://') == -1:
+                continue
+            i = '://'.join(u.split('://')[1:])
+            if i in results[consts.DF_URL_POT]:
+               to_filter.append(i)
+
+        results[consts.DF_URL_POT] = [i for i in results[consts.DF_URL_POT] if not i in to_filter] 
+
+        # filter actual urls from potential urls in clean results
+        to_filter = []
+        for u in results[consts.URL]:
+            i = '://'.join(u.split('://')[1:])
+            if i in results[consts.URL_POT]:
+               to_filter.append(i)
+
+        results[consts.URL_POT] = [i for i in results[consts.URL_POT] if not i in to_filter]
+
         return results
 
     @classmethod
